@@ -9,6 +9,7 @@
         <div class="col">
             <table class="table table-bordered">
                 <tr>
+                    <th>Sr. No.</th>
                   <th>SHA Key</th>
                   <th>Message</th>
                   <th>Commited By</th>
@@ -17,24 +18,27 @@
                 </tr>
                 
                   <tr>
-                   
+                    <% for(var i=0; i < respCommit.length; i++) { %>
+                        <td>
+                            <%= i + 1 %>
+                        </td>
                     <td>
-                      <%= respCommit.sha %>
+                      <%= respCommit[i].sha %>
                     </td>
                     <td>
-                      <%= respCommit.commit?.message %>
+                      <%= respCommit[i].commit?.message %>
                     </td>
                     <td>
-                      <%= respCommit.commit?.committer?.name %>
+                      <%= respCommit[i].commit?.committer?.name %>
                     </td>
                     <td>
-                      <%= respCommit.commit?.committer?.date %>
+                      <%= respCommit[i].commit?.committer?.date %>
                     </td>
                     <td>
-                      <a href="./files?sha=<%= respCommit.sha %>" class="link-primary">View Files</a>
+                      <a href="./files?sha=<%= respCommit[i].sha %>" class="link-primary">View Files</a>
                     </td>
                   </tr>
-                 
+                  <%}%>
               </table>
         </div>
     </div>

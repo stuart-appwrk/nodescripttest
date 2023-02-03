@@ -7,55 +7,51 @@
 <div class="container">
     <div class="row">
         <div class="col">
-            <table class="table table-bordered">
-                <tr>
-                    <th>Sr.No.</th>
-                    <th>File SHA Key</th>
-                    <th>File Name</th>
-                    <th>Additions</th>
-                    <th>Deletions</th>
-                    <th>Changes</th>
-                    <th></th>
-                </tr>
+            <% if (message !='' ) { %>
+                <div class="mt-5 mb-3">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <%= message %>
+                    </div>
+                </div>
+                <% } %>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Sr.No.</th>
+                            <th>File SHA Key</th>
+                            <th>File Name</th>
+                            <th>Additions</th>
+                            <th>Deletions</th>
+                            <th>Changes</th>
+                        </tr>
 
-                <% for(var i=0; i < changedFiles?.files?.length; i++) { %>
-                    <tr>
-                        <td>
-                            <%= i + 1 %>
-                        </td>
-                        <td>
-                            <%= changedFiles.files[i].sha %>
-                        </td>
-                        <td>
-                            <%= changedFiles.files[i].filename %>
-                        </td>
-                        <td>
-                            <%= changedFiles.files[i].additions %>
-                        </td>
-                        <td>
-                            <%= changedFiles.files[i].deletions %>
-                        </td>
-                        <td>
-                            <%= changedFiles.files[i].changes %>
-                        </td>
-                        <td><a href="./createFile?fileName=<%= changedFiles.files[i].filename %>"
-                                class="link-primary">Create Folder</a></td>
-                    </tr>
-                    <%}%>
-            </table>
-            <button id="btnCreate">Create</button>
+                        <% for(var i=0; i < changedFiles?.files?.length; i++) { %>
+                            <tr>
+                                <td>
+                                    <%= i + 1 %>
+                                </td>
+                                <td>
+                                    <%= changedFiles.files[i].sha %>
+                                </td>
+                                <td>
+                                    <%= changedFiles.files[i].filename %>
+                                </td>
+                                <td>
+                                    <%= changedFiles.files[i].additions %>
+                                </td>
+                                <td>
+                                    <%= changedFiles.files[i].deletions %>
+                                </td>
+                                <td>
+                                    <%= changedFiles.files[i].changes %>
+                                </td>
+                                
+                            </tr>
+                            <%}%>
+                    </table>
+                    <form method="post" action="/">
+                        <input type="submit" class="btn btn-info" value="Create">
+                    </form>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.3.js"
-        integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
-    <script src="../../public/value.js" crossorigin="anonymous"></script>
-    <script>
-        $('document').ready(function () {
-            $('body').on('click', '#btnCreate', async function () {
-                const user = 'stuart-appwrk';//req.params.user;
-                const reponame = 'nodescripttest'; //req.params.reponame;
-                const response = await getBranchesLists(user, reponame)
-                alert(response.length);
-            });
-        });
-    </script>
+    <!-- <td><a href="./createFile?fileName=<%= changedFiles.files[i].filename %>"
+        class="link-primary">Create Folder</a></td> -->

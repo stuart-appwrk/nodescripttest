@@ -1,7 +1,7 @@
 var fs = require('fs');
 
 async function createNewFile(folderName, content, fileName) {
-    const path = "../" + folderName;
+    let path = "../" + folderName;
     let msg = '';
     fs.access(path, (error) => {
         // To check if the given directory 
@@ -13,36 +13,48 @@ async function createNewFile(folderName, content, fileName) {
                 if (error) {
                     console.log(error);
                 } else {
-              
-                        fs.appendFile(path + '/' + fileName, content, async function (err) {
-                            if (err) throw err;
-                            msg='File is created successfully.';
-                        });
-                    
+                    createSubFolders(fileName, path)
+                    createFile(path, fileName, content)
                 }
             });
         } else {
+            createSubFolders(fileName, path)
             const isExists = fs.existsSync(path + '/' + fileName)
             if (isExists) {
                 // delete file
                 fs.unlink(path + '/' + fileName, async function (errr) {
                     if (errr) throw errr;
-                    // appendFile function with filename, content and callback function
-                    fs.appendFile(path + '/' + fileName, content, async function (err) {
-                        if (err) throw err;
-                        msg='File is created successfully.';
-                    });
+                    createFile(path, fileName, content)
                 });
             }
             else {
-                fs.appendFile(path + '/' + fileName, content, async function (err) {
-                    if (err) throw err;
-                    msg='File is created successfully.';
-                });
+                createFile(path, fileName, content)
             }
         }
     });
-    console.log('message',msg)
+
     return msg;
+}
+function createSubFolders(fileName, path) {
+    let offset = fileName.lastIndexOf('/')
+    fName = fileName.substring(offset + 1);
+    const folderName = fileName.substring(0, offset);
+    let folders = folderName.split('/');
+    folders.forEach(element => {
+        if (!fs.existsSync(path + '/' + element)) {
+            fs.mkdirSync(path + '/' + element);
+            
+        }
+        path += '/' + element;
+    });
+}
+function createFile(path, fileName, content) {
+    let msg ='';
+    // appendFile function with filename, content and callback function
+    fs.appendFile(path + '/' + fileName, content, async function (err) {
+        if (err) throw err;
+        msg = 'File is created successfully.';
+    });
+    console.log(msg)
 }
 module.exports = createNewFile

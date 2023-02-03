@@ -8,7 +8,7 @@ const generateOptions=(_path)=>{
         headers: {
             'User-Agent': constants.user_agent
         },
-        OAUth: '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'
+        OAUth: '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'
     }
 }
 
