@@ -1,0 +1,46 @@
+<command>
+  <name>add usr on time loading carrier move reason code</name>
+  <description>Add carrier move note on time loading details</description>
+  <type>Local Syntax</type>
+  <local-syntax>
+<![CDATA[
+
+[select distinct reacod.reacod as late_reacod
+   from reacod_reagrp
+   join reacod
+     on reacod.reacod = reacod_reagrp.reacod
+   left outer
+   join dscmst reacod_dsc
+     on reacod_dsc.colnam = 'reacod'
+    and reacod_dsc.colval = reacod_reagrp.reacod
+    and reacod_dsc.locale_id = nvl(@locale_id, @@locale_id)
+  where nvl(@client_id, client_id) = client_id
+    and reacod_reagrp.reagrp = 'LATE_REASON'
+    and reacod_dsc.lngdsc = @late_reacod]
+|	
+[select car_move_id,
+        notlin,
+        nottyp
+   from car_move_note
+  where car_move_id = @car_move_id
+    and nottyp = 'REA'] catch(@?)
+|
+if (@? != 0)
+{
+    create carrier move note
+     where car_move_id = @car_move_id
+       and notlin = '0001'
+       and nottxt = @late_reacod
+       and nottyp = 'REA'
+}
+else
+{
+    change carrier move note
+     where car_move_id = @car_move_id
+       and notlin = @notlin
+       and nottxt = @late_reacod
+       and nottyp = @nottyp
+}
+]]>
+</local-syntax>
+</command>

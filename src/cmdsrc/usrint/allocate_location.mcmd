@@ -1,0 +1,268 @@
+<command>
+  <name>allocate location</name>
+  <description>Allocate Location</description>
+  <type>Local Syntax</type>
+  <local-syntax>
+<![CDATA[
+/* This command will be executed as a part of location Override Capacity CR when F4 is pressed to override location when inventory is deposited after receiving and is excluded during Replenishment process. This will be called only when the LOC-OVR-MVMT-ZONE policy is enabled for the movement zones configured in rtstr1.*/
+if (@stoloc is not null and @alctyp != 'REPLEN' and @invmov_typ != 'RPLN')
+{
+    [select locmst.maxqvl,
+            locmst.locsts,
+            locmst.mov_zone_id
+       from locmst
+       join poldat_view
+         on poldat_view.polcod = 'USR-UNILEVER'
+        and poldat_view.polvar = 'LOC-OVR-MVMT-ZONE'
+        and poldat_view.polval = 'ENABLED'
+        and poldat_view.rtstr1 = locmst.mov_zone_id
+        and poldat_view.wh_id = locmst.wh_id
+      where locmst.stoloc = @stoloc
+        and locmst.wh_id = @wh_id
+        and locmst.locsts = 'F'] catch(-1403)
+    |
+    /* Session variable uc_maxqvl value holds the current maxqvl value of the location if its status is full. The status is updated to partial and maxqvl is set to curqvl+pndqvl+1 before the call to allocate location command*/
+    if (@? = 0)
+    {
+        save session variable
+         where name = 'uc_maxqvl'
+           and value = @maxqvl
+        |
+        [update locmst
+            set maxqvl = (curqvl + pndqvl + 1),
+                locsts = 'P'
+          where stoloc = @stoloc
+            and wh_id = @wh_id] catch(@?)
+    }
+}
+|
+^allocate location
+]]>
+</local-syntax>
+<argument name="lodnum" alias="load" datatype="string">
+    LPN - LPN for which a location needs to be allocated
+    Only one of the LPN identifiers needs to be supplied; can supply none of the LPN identifiers
+</argument>
+<argument name="subnum" datatype="string">
+    Sub-LPN - Sub-LPN for which a location needs to be allocated
+    Only one of the LPN identifiers needs to be supplied; can supply none of the LPN identifiers
+</argument>
+<argument name="dtlnum" datatype="string">
+    Detail LPN - Detail LPN for which a location needs to be allocated
+    Only one of the LPN identifiers needs to be supplied; can supply none of the LPN identifiers
+</argument>
+<argument name="mov_zone_id" datatype="integer">
+    Move Zone ID - Required movement zone; used to limit locations that can be allocated when specified
+    when no inventory identifier is specified, either curent building, movement zone, or storage location must be specified
+</argument>
+<argument name="sto_zone_id" datatype="integer">
+    Storage Zone ID - Required storage zone; used to limit locations that can be allocated when specified
+</argument>
+<argument name="wrk_zone_id" alias="zone" datatype="integer">
+    Work Zone ID - Required work zone; used to limit locations that can be allocated when specified
+</argument>
+<argument name="trcflg" alias="trace" datatype="integer">
+    Trace Flag - used as indicator that log messages should be written to trace file LESDIR/log/AllocLoc.Sts-LODNUM.log
+</argument>
+<argument name="stoloc" datatype="string">
+    Storage Location - specific location to validate and allocate
+    when no inventory identifier is specified, either curent building, movement zone, or storage location must be specified
+</argument>
+<argument name="prtnum" alias="part" datatype="string">
+    Item Number - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="prt_client_id" datatype="string">
+    Item Client ID - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="lotnum" alias="lot" datatype="string">
+    Lot Number - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="sup_lotnum" datatype="string">
+    Supplier Lot Number - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="revlvl" alias="revision" datatype="string">
+    Revision Level - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="orgcod" alias="origin" datatype="string">
+    Origin Code - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str1" datatype="string">
+    Inventory Attribute String 1 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str2" datatype="string">
+    Inventory Attribute String 2 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str3" datatype="string">
+    Inventory Attribute String 3 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str4" datatype="string">
+    Inventory Attribute String 4 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str5" datatype="string">
+    Inventory Attribute String 5 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str6" datatype="string">
+    Inventory Attribute String 6 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str7" datatype="string">
+    Inventory Attribute String 7 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str8" datatype="string">
+    Inventory Attribute String 8 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str9" datatype="string">
+    Inventory Attribute String 9 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str10" datatype="string">
+    Inventory Attribute String 10 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str11" datatype="string">
+    Inventory Attribute String 11 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str12" datatype="string">
+    Inventory Attribute String 12 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str13" datatype="string">
+    Inventory Attribute String 13 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str14" datatype="string">
+    Inventory Attribute String 14 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str15" datatype="string">
+    Inventory Attribute String 15 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str16" datatype="string">
+    Inventory Attribute String 16 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str17" datatype="string">
+    Inventory Attribute String 17 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_str18" datatype="string">
+    Inventory Attribute String 18 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_int1" datatype="integer">
+    Inventory Attribute Integer 1 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_int2" datatype="integer">
+    Inventory Attribute Integer 2 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_int3" datatype="integer">
+    Inventory Attribute Integer 3 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_int4" datatype="integer">
+    Inventory Attribute Integer 4 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_int5" datatype="integer">
+    Inventory Attribute Integer 5 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_flt1" datatype="float">
+    Inventory Attribute Float 1 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_flt2" datatype="float">
+    Inventory Attribute Float 2 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_flt3" datatype="float">
+    Inventory Attribute Float 3 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_dte1" datatype="string">
+    Inventory Attribute Date 1 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="inv_attr_dte2" datatype="string">
+    Inventory Attribute Date 2 - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="invsts" alias="status" datatype="string">
+    Inventory Status - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="untcas" datatype="integer">
+    Units per Case - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="untqty" datatype="integer">
+    Unit Quantity - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="fifdte" alias="fifo" datatype="string">
+    FIFO Date - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="alctyp" alias="type" datatype="string">
+    Allocation Type - Indicates the storage type for the allocation of location: REPLEN, TOPOFF-REPLEN, STORAGE
+</argument>
+<argument name="pipflg" alias="type" datatype="boolean">
+    Pre-inventory Allocation Flag - Indicates that we are allocating a location in PIA mode - probably for a demand replenishment.
+</argument>
+<argument name="ftpcod" datatype="string">
+    Item Footprint Code - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="untpak" datatype="integer">
+    Units per Pack - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="cur_bldg_id" datatype="string">
+    Current Building ID - used to determine storage sequence based on building;
+    when no inventory identifier is specified, either curent building, movement zone, or storage location must be specified
+</argument>
+<argument name="xdkref" datatype="string">
+    Crossdock Reference - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="xdkqty" datatype="integer">
+    Crossdock Quantity - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="invmov_typ" datatype="string">
+    Inventory Movement Type - reason for the move to the location allocated: PICK, RCV, RPLN, TRNS
+</argument>
+<argument name="asset_typ" datatype="string">
+    Handling Unit Type - must be a valid Handling Unit Type when supplied
+</argument>
+<argument name="load_attr1_flg" datatype="integer">
+    Load Attribute 1 Flag - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="load_attr2_flg" datatype="integer">
+    Load Attribute 2 Flag - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="load_attr3_flg" datatype="integer">
+    Load Attribute 3 Flag - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="load_attr4_flg" datatype="integer">
+    Load Attribute 4 Flag - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="load_attr5_flg" datatype="integer">
+    Load Attribute 5 Flag - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="wh_id" datatype="string">
+    Warehouse ID - used to limit queries to the warehouse specified;
+    must match the warehouse ID of the inventory identifier specified (when supplied)
+</argument>
+<argument name="dyn_slot_mode" datatype="integer">
+    Dynamic Slotting Mode - when specified as 1, QVL checks on the location being allocated will be skipped
+</argument>
+<argument name="mandte" datatype="string">
+    Manufactured Date - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="expire_dte" datatype="string">
+    Expiration Date - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="rttn_id" alias="rttn_id" datatype="string">
+    Rotation ID - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="supnum" datatype="string">
+    Supplier Number - can be supplied when no inventory identifier is provided to describe the inventory for which to allocate a location
+</argument>
+<argument name="debug_flg" datatype="integer">
+    Debug Flag - indicates whether Allocate Location should record issues in the No Location tables
+    when unable to find a location.
+</argument>
+<argument name="pck_steal_mod" datatype="boolean">
+    Pick Steal Mode - when specified as 1, indicates that the location being allocated can be a ship staging location
+</argument>
+<argument name="last_mov_zone_flg" datatype="boolean">
+    Last Movement Zone FLag - indicates that the allocation of location should use the last movement zone for the inventory rather that current;
+    accounts for inventory on a device which has a movement zone that should not matter
+</argument>
+<argument name="override_mix_on_unlock_flg" datatype="boolean">
+    Override Mixing on Unlock Flag - when specified as 1, overrides the mix on unlock flag setting of the movement zone
+</argument>
+<argument name="alloc_stats_id" datatype="string">
+    Allocation Statistics ID - used on No Location records to link to current run of allocation of inventory;
+    must be used in conjunction with Debug Flag
+</argument>
+<argument name="sto_te_flg" datatype="boolean">
+    Storage Trailer Flag - When specified as 1 , then move the Inventory to the storage trailer .
+</argument>
+</command>
