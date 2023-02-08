@@ -11,9 +11,11 @@ const getFileContent = require('./public/content');
 const createNewFile = require('./public/createFiles')
 const flash = require('connect-flash');
 var session = require('express-session');
+var fs = require('fs');
 
 let branch = '';
 let shaKey = '';
+let rollOut = '';
 const user = 'gabby-g007';//req.params.user;
 const reponame = 'nodescripttest'; //req.params.reponame;
 
@@ -51,6 +53,7 @@ app.get('/commits', async (req, res) => {
 })
 app.get('/files', async (req, res) => {
     shaKey = req.query.sha
+    rollOut = req.query.commit
     const allFiles = await getAllFiles(user, reponame, shaKey)
     //console.log('allFiles : ',allFiles.files)
     res.render('pages/files', { changedFiles: allFiles, message: '' });
@@ -64,11 +67,19 @@ app.get('/createFile', async (req, res) => {
 app.post('/', async function (req, res) {
     const allFiles = await getAllFiles(user, reponame, shaKey)
     const changedFiles = allFiles.files;
-    changedFiles.forEach(async file => {
-        if (file.status !== 'removed') {
-           // console.log('fileStatus : ', file.status)
-            const content = await getFileContent(user, reponame, shaKey, file.filename);
-            const newFile = await createNewFile(branch, content, file.filename);
+    let path = '../' + branch + '/hotfixes/' + rollOut;
+    fs.access(path, (error) => {
+        if (error) {
+            fs.mkdir(path, async (error) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    createPackage(path, changedFiles, rollOut);
+                }
+            })
+        }
+        else {
+            createPackage(path, changedFiles, rollOut);
         }
     });
 
@@ -76,6 +87,36 @@ app.post('/', async function (req, res) {
     res.redirect('/')
     //res.render('pages/files', { changedFiles: allFiles, message: req.flash().success[0] });
 });
+async function createPackage(path, changedFiles, rollOutNumber) {
+    var scriptFile = [];
+    scriptFile.push("# Extension ", rollOutNumber, "\n#\n# This script has been built automatically using RolloutBuilder.\n", "# Please check the actions taken by the script as they may not be entirely correct.\n", "# Also check the order of the actions taken if any dependencies might be\n", "# encountered\n", "#\n", "# Replacing files affected by extension.\n");
+    scriptFile.push("\n\n")
+    for (const file of changedFiles) {
+        if (file.status !== 'removed') {
+            let offset = file.filename.lastIndexOf('/')
+            let folderName = file.filename.substring(0, offset);
+            const content = await getFileContent(user, reponame, shaKey, file.filename);
+            const newFile = await createNewFile(path, content, file.filename);
+            if (folderName.includes('pkg')) {
+                folderName = folderName.slice(4, folderName.length);
+            }
+            scriptFile.push("REPLACE ", file.filename, " ", "$LESDIR/" + folderName, "\n");
+        }
+    }
+    scriptFile.push("\n# Removing files removed by extension.\n");
+    scriptFile.push("\n");
+    //scriptFile.push(generateProcessingScript(scriptLocation));
+    scriptFile.push("\n");
+    scriptFile.push("\n# END OF AUTO-GENERATED SCRIPT.\n");
+    const html = scriptFile.join("");
+
+    fs.appendFile(path + "/" + rollOutNumber, html, function (err) {
+        if (err) throw err;
+        let msg = 'File is created successfully.';
+        console.log('message : ', msg);
+    });
+}
+
 // app.get('/', async (req,res)=>{
 //     const user = 'stuart-appwrk';//req.params.user;
 //     const reponame = 'nodescripttest'; //req.params.reponame;

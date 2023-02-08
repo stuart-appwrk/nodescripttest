@@ -1,0 +1,23 @@
+<action>
+	<id>usrListOverflowInboundOrders</id>
+	<name>list overflow Inbound orders</name>
+	<description>Display Overflow Inbound Orders</description>
+	<type>LIST</type>
+	<ws>
+		<method>GET</method>
+		<href>/usrListOverflowInboundOrders</href>
+	</ws>
+	<impl>
+	    <command>list usr overflow inbound orders</command>	
+	</impl>
+	<listConfig>
+		<columnConfig>usrListOverflowInboundConfig</columnConfig>
+		<filterable/>
+		<pageable/>
+		<sortable/>
+	</listConfig>
+	<auth>
+	    <opt>optOpen</opt>
+	</auth>
+	<primary>true</primary>
+</action>

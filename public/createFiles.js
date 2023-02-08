@@ -1,7 +1,7 @@
 var fs = require('fs');
 
-async function createNewFile(folderName, content, fileName) {
-    let path = "../" + folderName;
+async function createNewFile(path, content, fileName) {
+    //let path = "../" + folderName+"/hotfixes";
     let msg = '';
     fs.access(path, (error) => {
         // To check if the given directory 
@@ -55,6 +55,6 @@ function createFile(path, fileName, content) {
         if (err) throw err;
         msg = 'File is created successfully.';
     });
-    console.log(msg)
+    
 }
 module.exports = createNewFile
