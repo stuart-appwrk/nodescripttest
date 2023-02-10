@@ -1,7 +1,6 @@
 var fs = require('fs');
 
 async function createNewFile(path, content, fileName) {
-    //let path = "../" + folderName+"/hotfixes";
     let msg = '';
     fs.access(path, (error) => {
         // To check if the given directory 
@@ -18,18 +17,8 @@ async function createNewFile(path, content, fileName) {
                 }
             });
         } else {
-            createSubFolders(fileName, path)
-            const isExists = fs.existsSync(path + '/' + fileName)
-            if (isExists) {
-                // delete file
-                fs.unlink(path + '/' + fileName, async function (errr) {
-                    if (errr) throw errr;
-                    createFile(path, fileName, content)
-                });
-            }
-            else {
-                createFile(path, fileName, content)
-            }
+            createSubFolders(fileName, path);         
+            createFile(path, fileName, content);
         }
     });
 
@@ -43,7 +32,6 @@ function createSubFolders(fileName, path) {
     folders.forEach(element => {
         if (!fs.existsSync(path + '/' + element)) {
             fs.mkdirSync(path + '/' + element);
-            
         }
         path += '/' + element;
     });
@@ -51,10 +39,10 @@ function createSubFolders(fileName, path) {
 function createFile(path, fileName, content) {
     let msg ='';
     // appendFile function with filename, content and callback function
-    fs.appendFile(path + '/' + fileName, content, async function (err) {
+    fs.writeFile(path + '/' + fileName, content, async function (err) {
         if (err) throw err;
         msg = 'File is created successfully.';
     });
-    
+
 }
 module.exports = createNewFile

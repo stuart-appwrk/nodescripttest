@@ -5,38 +5,36 @@
   <%- include('../partials/header'); %>
 </header>
 <div class="container">
-  <div class="row">
-    <div class="col">
-      <!-- <select class="form-control">
-        <option value="">Select Branch</option>
-        <% for(var i=0; i < response.length; i++) { %>
-          <option value='<%= response[i].name %>'>
-            <%= response[i].name %>
-          </option>
-          <%}%>
-      </select> -->
-      <table class="table table-bordered">
-        <tr>
-          <th>Sr.No.</th>
-          <th>Branch Name</th>
-          <th>Commits</th>
-        </tr>
-        <% for(var i=0; i < response.length; i++) { %>
+  <!-- <form method="post" action="/branches"> </form> -->
+    <div class="row">
+      <div class="col">
+        
+        <table class="table table-bordered">
           <tr>
-            <td>
-              <%= i + 1 %>
-            </td>
-            <td>
-              <%= response[i].name %>
-            </td>
-            <td>
-              <a href="./commits?branch=<%= response[i].name %>" class="link-primary">View Commits</a>
-            </td>
+            <th>Sr.No.</th>
+            <th>Branch Name</th>
+            <th>Commits</th>
           </tr>
-          <%}%>
-      </table>
+          <% for(var i=0; i < response.length; i++) { %>
+            <tr>
+              <td>
+                <%= i + 1 %>
+              </td>
+              <td>
+                <%= response[i].name %>
+              </td>
+              <td>
+                <a href="./commits?branch=<%= response[i].name %>" class="link-primary">View Commits</a>
+              </td>
+            </tr>
+            <%}%>
+        </table>
+      </div>
+      <!-- <div class="col">
+        <input type="submit" class="btn btn-info" value="Get Branches">
+      </div> -->
     </div>
-  </div>
+ 
 </div>
 <footer>
   <%- include('../partials/footer'); %>

@@ -8,7 +8,7 @@ const generateOptions=(_path)=>{
         headers: {
             'User-Agent': constants.user_agent
         },
-        OAUth: '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'
+        OAUth: process.env.GH_TOKEN
     }
 }
 
