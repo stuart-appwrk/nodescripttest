@@ -1,44 +1,46 @@
 <head>
-    <%- include('../partials/head'); %>
+  <%- include('../partials/head'); %>
 </head>
 <header>
-    <%- include('../partials/header'); %>
+  <%- include('../partials/header'); %>
 </header>
 <div class="container">
-    <div class="row">
-        <div class="col">
-            <table class="table table-bordered">
-                <tr>
-                    <th>Sr. No.</th>
-                  <th>SHA Key</th>
-                  <th>Message</th>
-                  <th>Commited By</th>
-                  <th>Date</th>
-                  <th></th>
-                </tr>
-                
-                  <tr>
-                    <% for(var i=0; i < respCommit.length; i++) { %>
-                        <td>
-                            <%= i + 1 %>
-                        </td>
-                    <td>
-                      <%= respCommit[i].sha %>
-                    </td>
-                    <td>
-                      <%= respCommit[i].commit?.message %>
-                    </td>
-                    <td>
-                      <%= respCommit[i].commit?.committer?.name %>
-                    </td>
-                    <td>
-                      <%= respCommit[i].commit?.committer?.date %>
-                    </td>
-                    <td>
-                      <a href="./files?sha=<%= respCommit[i].sha %>" class="link-primary">View Files</a>
-                    </td>
-                  </tr>
-                  <%}%>
-              </table>
-        </div>
+  <div class="row">
+    <div class="col">
+      <table class="table table-bordered">
+        <tr>
+          <th>Sr. No.</th>
+          <th>SHA Key</th>
+          <th>Message</th>
+          <th>Commited By</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+        <% for(var i=0; i < respCommit.length; i++) { %>
+          <% if(respCommit[i].commit?.message.toString().includes('UL-TMP')){ %>
+            <tr>
+              <td>
+                <%= i + 1 %>
+              </td>
+              <td>
+                <%= respCommit[i].sha %>
+              </td>
+              <td>
+                <%= respCommit[i].commit?.message %>
+              </td>
+              <td>
+                <%= respCommit[i].commit?.committer?.name %>
+              </td>
+              <td>
+                <%= respCommit[i].commit?.committer?.date %>
+              </td>
+              <td>
+                <a href="./files?sha=<%= respCommit[i].sha %>&commit=<%= respCommit[i].commit?.message %>"
+                  class="link-primary">View Files</a>
+              </td>
+            </tr>
+            <%}%>
+              <%}%>
+      </table>
     </div>
+  </div>

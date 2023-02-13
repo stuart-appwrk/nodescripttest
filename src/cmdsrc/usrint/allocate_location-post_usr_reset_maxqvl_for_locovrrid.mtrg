@@ -1,0 +1,29 @@
+<trigger>
+  <name>post usr reset maxqvl for locovrrid</name>
+  <on-command>allocate location</on-command>
+  <description>Post usr reset maxqvl for locovrrid</description>
+  <fire-sequence>100</fire-sequence>
+  <local-syntax>
+<![CDATA[
+/* This trigger has been created as a part of location Override Capacity CR to reset the maxqvl value to the session variable uc_maxqvl value after the location is allocated successfully*/
+get session variable
+ where name = 'uc_maxqvl' catch(@?)
+|
+publish data
+ where uc_maxqvl = @value
+|
+if (@uc_maxqvl is not null)
+{
+    [update locmst
+        set maxqvl = @uc_maxqvl
+      where stoloc = @stoloc
+        and wh_id = @wh_id] catch(@?)
+    |
+    reset location status
+     where stoloc = @stoloc
+       and wh_id = @wh_id
+}
+]]>
+</local-syntax>
+  <enable>yes</enable>
+</trigger>

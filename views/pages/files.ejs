@@ -22,6 +22,7 @@
                             <th>Additions</th>
                             <th>Deletions</th>
                             <th>Changes</th>
+                            <th></th>
                         </tr>
 
                         <% for(var i=0; i < changedFiles?.files?.length; i++) { %>
@@ -44,12 +45,14 @@
                                 <td>
                                     <%= changedFiles.files[i].changes %>
                                 </td>
-                                
+                                <td>
+                                    <a href="./createFile?fileName=<%= changedFiles.files[i].filename %>" class="link-primary">Create Folder</a>
+                                  </td>
                             </tr>
                             <%}%>
                     </table>
                     <form method="post" action="/">
-                        <input type="submit" class="btn btn-info" value="Create">
+                        <input type="submit" class="btn btn-info" value="Create Rollout">
                     </form>
         </div>
     </div>

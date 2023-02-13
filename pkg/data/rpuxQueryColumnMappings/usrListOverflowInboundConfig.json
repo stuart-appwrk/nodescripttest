@@ -1,0 +1,12 @@
+{
+"columns":{
+"stoloc":{
+"type":"java.lang.String",
+"alias":"locmst.stoloc"
+},
+"rtstr2":{
+"type":"java.lang.String",
+"alias":"p.rtstr2"
+}
+}
+}
