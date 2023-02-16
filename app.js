@@ -2,23 +2,20 @@ const express = require('express');
 const cors = require('cors');
 const middlewares = require('./middlewares');
 const routes = require('./routes');
-const { generateOptions } = require('./utils');
-const https = require('https');
-const getBranchesLists = require('./public/branches');
-const getAllCommits = require('./public/commits');
-const getAllFiles = require('./public/allFiles');
+const { getBranchesLists, getAllFiles, getAllCommits, checkRollout } = require('./public/controllers');
 const getFileContent = require('./public/content');
 const createNewFile = require('./public/createFiles')
 const flash = require('connect-flash');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 const archiver = require('archiver');
-const decompress = require("decompress");
-const sftp = require("./public/FTPClient");
-let async = require('async');
-
+let Client = require('ssh2-sftp-client');
 var fs = require('fs');
-const getAllRepo = require('./public/allRepoList');
+var rexec = require('remote-exec');
+require('dotenv').config();
+const sql = require("msnodesqlv8");
+
+const connectionString = "server=DESKTOP-KUVG2Q9;Database=WMSAutomation;Trusted_Connection=Yes;Driver={SQL Server Native Client 11.0}";
 
 let branch = '';
 let shaKey = '';
@@ -33,17 +30,15 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
+app.use(express.static('public'))
 app.use(middlewares.setHeaders);
 app.use('/github_api', routes);
 app.use(session({
     secret: 'keyboard cat',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { secure: true }
 }))
-const siteList = [{ name: "Site1" }, { name: "Site2" }]
-const envList = [{ name: "Dev" }, { name: "QA" }, { name: "Prod" }]
-
 
 app.use(flash());
 app.use(function (req, res, next) {
@@ -53,6 +48,7 @@ app.use(function (req, res, next) {
     // res.locals.users = req.user || null;
     next();
 });
+
 app.get('/', async (req, res) => {
     //const repoList = await getAllRepo(user)
     const branchList = await getBranchesLists(user, reponame)
@@ -73,7 +69,6 @@ app.get('/files', async (req, res) => {
     shaKey = req.query.sha
     rollOut = req.query.commit
     const allFiles = await getAllFiles(user, reponame, shaKey)
-    //console.log('allFiles : ',allFiles.files)
     res.render('pages/files', { changedFiles: allFiles, message: '' });
 })
 app.get('/createFile', async (req, res) => {
@@ -82,53 +77,63 @@ app.get('/createFile', async (req, res) => {
     const newFile = await createNewFile(branch, content, fileName)
     res.render('pages/createFile', { content: newFile });
 })
-app.post('/', async function (req, res) {
+app.post('/deployRollout', async function (req, res) {
     const allFiles = await getAllFiles(user, reponame, shaKey)
     const changedFiles = allFiles.files;
+    const query = "select top 1 rollout_name from rollout_master where rollout_name='" + rollOut + "'";
+    sql.query(connectionString, query, (err, rows) => {
+        if (rows.length <= 0) {
+            const rolloutQuery = "insert into rollout_master (rollout_name) values('" + rollOut + "')";
+            sql.query(connectionString, rolloutQuery, (err, response) => {
+                if (err) console.log('error : ', err);
+                let path = 'hotfixes/' + rollOut;
+                fs.access(path, (error) => {
+                    if (error) {
+                        fs.mkdir(path, async (error) => {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                createPackage(path, changedFiles, rollOut);
+                            }
+                        })
+                    }
+                    else {
+                        createPackage(path, changedFiles, rollOut);
+                    }
+                });
+                generateZipFolder(path, path + ".zip");
+                req.flash('message', "The rollout has been created.");
+                const query = "select site_id as id,site_name as name from site_master";
+                sql.query(connectionString, query, (err, siteList) => {
+                    if (err) console.log(err);
+                    res.render('pages/deployRollout', { siteList: siteList });
+                });
 
-    let path = 'hotfixes/' + rollOut;
-    fs.access(path, (error) => {
-        if (error) {
-            fs.mkdir(path, async (error) => {
-                if (error) {
-                    console.log(error);
-                } else {
-                    createPackage(path, changedFiles, rollOut);
-                }
-            })
+            });
         }
         else {
-            createPackage(path, changedFiles, rollOut);
+            req.flash('message', "The rollout is already created.");
+            const query = "select site_id as id,site_name as name from site_master";
+            sql.query(connectionString, query, (err, siteList) => {
+                if (err) console.log(err);
+                res.render('pages/deployRollout', { siteList: siteList });
+            });
         }
     });
-    generateZipFolder(path, path + ".zip");
-    // var util = require('util'),
-    //     spawn = require('child_process').spawn,
-    //     carrier = require('carrier'),
-    //     pl_proc = spawn('perl', [path + '/' + 'rollout.pl',rollOut]),
-    //     my_carrier;
-    // my_carrier = carrier.carry(pl_proc.stdout);
-    // my_carrier.on('line', function (line) {
-    //     // Do stuff...
-    //     console.log('line : ' + line);
-    // })
-    req.flash('success_msg', 'Files has been created/saved successfully.')
-    //res.redirect('/')
-    res.render('pages/deployRollout', { siteList: siteList, envList: envList });
 });
 app.post('/deploy', async function (req, res) {
+    let siteId = req.body.site;
+    let envId = req.body.environment;
     //zip the folder to the server 
     let path = 'hotfixes/' + rollOut;
-    generateZipFolder(path, path + ".zip");
-    transferZipFolder(path);
-    // //unzip the folder on server 
-    // decompress( path + ".zip", path)
-    //     .then((files) => {
-    //         console.log(files);
-    //     })
-    //     .catch((error) => {
-    //         console.log(error);
-    //     });
+    let serverPath = 'LES\\hotfixes\\' + rollOut;
+    const query = "SELECT [site_env_host] as Host ,[site_env_port] as [Port] ,[site_env_username] as Username,[site_env_password] as [Password] FROM [dbo].[site_env_mapping] where site_env_siteid=" + siteId + " and site_env_envid=" + envId;
+    sql.query(connectionString, query, (err, server) => {
+        if (err) console.log(err);
+        console.log("server : ", server)
+        transferZipFolder(path, serverPath, server);
+    });
+
     res.redirect('/')
     //res.render('pages/deploy', { siteList: siteList, envList: envList });
 });
@@ -209,7 +214,7 @@ function generateLoadDataScript(changedFiles) {
             if (folderPath.includes('LES')) {
                 folderPath = folderPath.slice(4, folderPath.length);
             }
-            let filePath = file.filename.replace('LES', '$LESDIR/');
+            let filePath = file.filename.replace('LES', '$LESDIR');
             if (fileName.match(/\.(csv)$/i)) {
                 let offset = fileName.indexOf('-');
                 if (offset > 0) {
@@ -255,18 +260,50 @@ function generateZipFolder(sourceDir, outPath) {
         archive.finalize();
     });
 }
-async function transferZipFolder(path) {
-    const client = new sftp('host', 21, 'username', 'password', false);
-    client.upload(path + ".zip", 'LES/hotfixes/' + rollOut + ".zip");
-    //client.decompress(path + ".zip", 'LES/hotfixes/' + rollOut);
-    
+async function transferZipFolder(path, serverPath, server) {
+    try {
+        let sftp = new Client();
+        sftp.connect({ host: server.Host, port: server.Port, username: server.Username, password: server.Password }).then(() => {
+            sftp.put(path + ".zip", 'LES/hotfixes/' + rollOut + ".zip");
+        }).then(data => {
+            console.log('File/Folder transfer successfully at selected server.');
+        }).catch(err => {
+            console.log(err, 'catch error');
+        });
+
+        var connection_options = {
+            port: server.Port,
+            username: server.Username,
+            password: server.Password
+        };
+
+        var hosts = [server.Host
+        ];
+
+        var cmds = [
+            "mkdir " + serverPath,
+            "tar -xf " + serverPath + ".zip -C " + serverPath,
+            "LES\\data\\env",
+            //"perl "+serverPath+"\\rollout.pl " + rollOut,
+            "perl " + serverPath + "\\script.pl"
+        ];
+
+        rexec(hosts, cmds, connection_options, async function () {
+            console.log('Folder extracted successfully at selected server!');
+        });
+    }
+    catch (ex) {
+
+    }
 }
-
-// app.get('/', async (req,res)=>{
-//     const user = 'stuart-appwrk';//req.params.user;
-//     const reponame = 'nodescripttest'; //req.params.reponame;
-//     const response = await getAllCommits(user,reponame)
-//     res.render('pages/home',{response : response});
-// })
-
+app.route('/deployRollout')
+    .get((req, res) => {
+        res.render('pages/deployRollout', { siteList: siteList, envList: envList });
+    })
+app.get('/environment/:id', (req, res) => {
+    const query = "SELECT [site_env_envid] as id, [env_name] as [name]  FROM [dbo].[site_env_mapping],env_master where site_env_siteid=" + req.params.id + " and env_id=site_env_envid";
+    sql.query(connectionString, query, (err, rows) => {
+        res.json(rows);
+    });
+});
 app.listen(PORT, () => console.log(`Server started on port ${PORT}...`))

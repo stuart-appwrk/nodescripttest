@@ -10,23 +10,20 @@
             <form method="post" action="/deploy">
                 <div class="row">
                     <div class="col">
-                        <select class="form-control site" name="site">
+                        <form method="post" action="/onchange">
+                        <select class="form-control site" name="site" id="site">
                             <option value="">Select Site</option>
                             <% for(var i=0; i < siteList.length; i++) { %>
-                                <option value='<%= siteList[i].name %>'>
+                                <option value='<%= siteList[i].id %>'>
                                     <%= siteList[i].name %>
                                 </option>
                                 <%}%>
                         </select>
+                        </form>
                     </div>
                     <div class="col">
-                        <select class="form-control repo" name="repo">
-                            <option value="">Select Evironment</option>
-                            <% for(var i=0; i < envList.length; i++) { %>
-                                <option value='<%= envList[i].name %>'>
-                                    <%= envList[i].name %>
-                                </option>
-                                <%}%>
+                        <select class="form-control environment" name="environment" id="environment">
+                            
                         </select>
                     </div>
                     <div class="col">

@@ -1,6 +1,3 @@
-const { generateOptions } = require('../utils');
-const https = require('https');
-
 const fetch = require('node-fetch');
 
 async function getFileContent(user, reponame,shakey,fileName)
