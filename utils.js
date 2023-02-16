@@ -6,7 +6,8 @@ const generateOptions=(_path)=>{
         hostname: constants.hostname,
         path: _path,
         headers: {
-            'User-Agent': constants.user_agent
+            'User-Agent': constants.user_agent,
+            'authorization': process.env.GITHUB_ACCESS_TOKEN
         },
         OAUth: process.env.GH_TOKEN
     }
