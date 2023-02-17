@@ -4,6 +4,56 @@
 <header>
     <%- include('../partials/header'); %>
 </header>
+
+<section class="step-container my-3">
+    <div class="container">
+      <div class="row d-flex justify-content-center">
+        <div class="col-md-8">
+          <div class="wizard">
+            <div class="wizard-inner">
+              <div class="connecting-line"></div>
+              <ul class="nav nav-tabs step-nav" role="tablist">
+                <li role="presentation" id="step1" class="active">
+                  <a
+                    role="tab"
+                    aria-expanded="true"
+                    ><span class="round-tab">1 </span> <i>Branches</i></a
+                  >
+                </li>
+                <li role="presentation" id="step2" class="active">
+                  <a
+                    role="tab"
+                    aria-expanded="false"
+                    ><span class="round-tab">2</span> <i>Commits</i></a
+                  >
+                </li>
+                <li role="presentation" id="step3" class="active">
+                  <a
+                    role="tab"
+                    ><span class="round-tab">3</span> <i>Files</i></a
+                  >
+                </li>
+                <li role="presentation" id="step4" class="active">
+                  <a
+                    role="tab"
+                    ><span class="round-tab">4</span> <i>Rollout</i></a
+                  >
+                </li>
+                <li role="presentation" id="step5" class="disabled">
+                    <a
+                      role="tab"
+                      ><span class="round-tab">5</span> <i>Deploy Script</i></a
+                    >
+                  </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
 <div class="container">
     <div class="row">
         <div class="col">
@@ -27,7 +77,9 @@
                         </select>
                     </div>
                     <div class="col">
-                        <input type="submit" class="btn btn-info" value="Deploy Script">
+                        <div class="d-grid gap-2">
+                            <input type="submit" class="btn btn-info btn-block" value="Deploy Script">
+                        </div>
                     </div>
                 </div>
             </form>
