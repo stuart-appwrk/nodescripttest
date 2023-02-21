@@ -2,10 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const middlewares = require('./middlewares');
 const routes = require('./routes');
-const { getBranchesLists, getAllFiles, getAllCommits } = require('./public/controllers');
-const getFileContent = require('./public/content');
-const { createNewFile } = require('./public/createFiles')
-const { createPackage, makeUninstallDir, generateZipDir, deployScript,executeUninstall,getToastAlert } = require('./public/createRollout')
+const { getBranchesLists, getAllFiles, getAllCommits } = require('./controllers/controllers');
+const getFileContent = require('./controllers/content');
+const { createNewFile } = require('./controllers/createFiles')
+const { createPackage, makeUninstallDir, generateZipDir, deployScript,executeUninstall,getToastAlert } = require('./controllers/createRollout')
 const flash = require('connect-flash');
 var session = require('express-session');
 var bodyParser = require('body-parser');
@@ -32,6 +32,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static('public'));
+app.use(express.static('controllers'));
 app.use(cors());
 app.use(middlewares.setHeaders);
 app.use('/github_api', routes);
@@ -114,11 +115,11 @@ app.post('/deployRollout', async function (req, res) {
     //});
     // }
     // else {
-    //     req.flash('message', "The rollout is already created.");
+    //     getToastAlert(req, 'success', "The rollout is already created.");
     //     const query = "select site_id as id,site_name as name from site_master";
     //     sql.query(connectionString, query, (err, siteList) => {
     //         if (err) console.log(err);
-    //         res.render('pages/deployRollout', { siteList: siteList });
+    //         res.render('pages/deployRollout', { siteList: siteList, req: req });
     //     });
     // }
     //});
