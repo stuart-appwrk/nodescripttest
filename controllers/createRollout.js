@@ -106,10 +106,10 @@ async function buildUninstallPackage(path, changedFiles, rollOutNumber,user, rep
                         let sftp = new Client();
                         let isAvailable = false;
                         await sftp.connect({
-                            host: '172.16.1.230',
-                            port: '22',
-                            username: 'REMOTE-5 (YOUCAST)',
-                            password: '123'
+                            host: 'host',
+                            port: 'port',
+                            username: 'username',
+                            password: 'pwd'
                         }).then(() => {
                             return sftp.get(file.filename);
                         }).then(res => {
