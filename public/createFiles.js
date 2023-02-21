@@ -17,7 +17,7 @@ async function createNewFile(path, content, fileName) {
                 }
             });
         } else {
-            createSubFolders(fileName, path);         
+            createSubFolders(fileName, path);
             createFile(path, fileName, content);
         }
     });
@@ -26,7 +26,6 @@ async function createNewFile(path, content, fileName) {
 }
 function createSubFolders(fileName, path) {
     let offset = fileName.lastIndexOf('/')
-    fName = fileName.substring(offset + 1);
     const folderName = fileName.substring(0, offset);
     let folders = folderName.split('/');
     folders.forEach(element => {
@@ -37,7 +36,7 @@ function createSubFolders(fileName, path) {
     });
 }
 function createFile(path, fileName, content) {
-    let msg ='';
+    let msg = '';
     // appendFile function with filename, content and callback function
     fs.writeFile(path + '/' + fileName, content, async function (err) {
         if (err) throw err;
@@ -45,4 +44,4 @@ function createFile(path, fileName, content) {
     });
 
 }
-module.exports = createNewFile
+module.exports = { createNewFile, createSubFolders }

@@ -3,13 +3,13 @@ const https = require('https');
 const fetch = require('node-fetch');
 
 function getAllRepo(user) {
-    const options = generateOptions('/users/'+user + '/repos')
+    const options = generateOptions('/users/' + user + '/repos')
     return new Promise((resolve) => {
         let data = ''
         https.get(options, res => {
             res.on('data', chunk => { data += chunk })
             res.on('end', () => {
-                resolve(JSON.parse(data));                
+                resolve(JSON.parse(data));
             })
         })
     })
@@ -27,8 +27,8 @@ function getBranchesLists(user, reponame) {
         })
     })
 }
-function getAllCommits(user, reponame,branch) {
-    const options = generateOptions('/repos/' + user + '/' + reponame + '/commits?sha='+branch)
+function getAllCommits(user, reponame, branch) {
+    const options = generateOptions('/repos/' + user + '/' + reponame + '/commits?sha=' + branch)
     return new Promise((resolve) => {
         let data = ''
         https.get(options, res => {
@@ -39,8 +39,8 @@ function getAllCommits(user, reponame,branch) {
         })
     })
 }
-function getAllFiles(user, reponame,shaKey) {
-    const options = generateOptions('/repos/' + user + '/' + reponame + '/commits/'+shaKey)
+function getAllFiles(user, reponame, shaKey) {
+    const options = generateOptions('/repos/' + user + '/' + reponame + '/commits/' + shaKey)
     return new Promise((resolve) => {
         let data = ''
         https.get(options, res => {
@@ -52,4 +52,4 @@ function getAllFiles(user, reponame,shaKey) {
     })
 }
 
-module.exports = {getAllRepo,getBranchesLists,getAllCommits,getAllFiles}
+module.exports = { getAllRepo, getBranchesLists, getAllCommits, getAllFiles }
