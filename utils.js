@@ -1,15 +1,15 @@
-const constants=require('./constants');
-var env = require("dotenv").config();
+const constants = require('./constants');
+require('dotenv').config();
 
 const generateOptions=(_path)=>{
     return options = {
         hostname: constants.hostname,
         path: _path,
-        headers: {
-            'User-Agent': constants.user_agent,
-            'authorization': process.env.GITHUB_ACCESS_TOKEN
-        },
-        OAUth: process.env.GH_TOKEN
+        headers: { 
+            'User-Agent': constants.user_agent
+            //authorization: "token " + process.env.GH_TOKEN
+        }
+        //OAuth: process.env.GH_TOKEN
     }
 }
 

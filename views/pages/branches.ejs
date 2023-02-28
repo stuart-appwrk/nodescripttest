@@ -1,35 +1,35 @@
 <head>
-    <%- include('../partials/head'); %>
-  </head>
-  <header>
-    <%- include('../partials/header'); %>
-  </header>
-  <div class="container">
-    <div class="row">
-      <div class="col">
-          <table class="table table-bordered">
-            <tr>
-              <th>Sr.No.</th>
-              <th>Branch Name</th>
-              <th>Commits</th>
-            </tr>
-            <% for(var i=0; i < response.length; i++) { %>
-              <tr>
-                <td>
-                  <%= i + 1 %>
-                </td>
-                <td>
-                  <%= response[i].name %>
-                </td>
-                <td>
-                  <a href="./commits?branch=<%= response[i].name %>" class="link-primary">View Commits</a>
-                </td>
-              </tr>
-              <%}%>
-          </table>
-      </div>
+  <%- include('../partials/head'); %>
+</head>
+<header>
+  <%- include('../partials/header'); %>
+</header>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <table class="table table-bordered">
+        <tr>
+          <th>Sr.No.</th>
+          <th>Branch Name</th>
+          <th>Commits</th>
+        </tr>
+        <% for(var i=0; i < response.length; i++) { %>
+          <tr>
+            <td>
+              <%= i + 1 %>
+            </td>
+            <td>
+              <%= response[i].name %>
+            </td>
+            <td>
+              <a href="./commits?branch=<%= response[i].name %>" class="link-primary">View Commits</a>
+            </td>
+          </tr>
+          <%}%>
+      </table>
     </div>
   </div>
-  <footer>
-    <%- include('../partials/footer'); %>
-  </footer>
+</div>
+<footer>
+  <%- include('../partials/footer'); %>
+</footer>

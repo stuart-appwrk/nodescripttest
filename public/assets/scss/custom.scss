@@ -230,7 +230,13 @@ input[type="checkbox"]:checked::before {
   background-color: #18ba60;
   border-color: #18ba60;
 }
-
+.logo{
+  height: 50px;
+  width: auto;
+}
+.table,th,td{
+  vertical-align: middle;
+}
 @media (max-width: 767px) {
   .wizard .nav-tabs > li a i {
     display: none;

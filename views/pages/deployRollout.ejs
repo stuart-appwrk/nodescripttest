@@ -1,94 +1,81 @@
 <head>
-    <%- include('../partials/head'); %>
+  <%- include('../partials/head'); %>
 </head>
 <header>
-    <%- include('../partials/header'); %>
+  <%- include('../partials/header'); %>
 </header>
 
 <section class="step-container my-3">
-    <div class="container">
-      <div class="row d-flex justify-content-center">
-        <div class="col-md-8">
-          <div class="wizard">
-            <div class="wizard-inner">
-              <div class="connecting-line"></div>
-              <ul class="nav nav-tabs step-nav" role="tablist">
-                <li role="presentation" id="step1" class="active">
-                  <a
-                    role="tab"
-                    aria-expanded="true"
-                    ><span class="round-tab">1 </span> <i>Branches</i></a
-                  >
-                </li>
-                <li role="presentation" id="step2" class="active">
-                  <a
-                    role="tab"
-                    aria-expanded="false"
-                    ><span class="round-tab">2</span> <i>Commits</i></a
-                  >
-                </li>
-                <li role="presentation" id="step3" class="active">
-                  <a
-                    role="tab"
-                    ><span class="round-tab">3</span> <i>Files</i></a
-                  >
-                </li>
-                <li role="presentation" id="step4" class="active">
-                  <a
-                    role="tab"
-                    ><span class="round-tab">4</span> <i>Rollout</i></a
-                  >
-                </li>
-                <li role="presentation" id="step5" class="disabled">
-                    <a
-                      role="tab"
-                      ><span class="round-tab">5</span> <i>Deploy Script</i></a
-                    >
-                  </li>
-              </ul>
-            </div>
+  <div class="container">
+    <div class="row d-flex justify-content-center">
+      <div class="col-md-8">
+        <div class="wizard">
+          <div class="wizard-inner">
+            <div class="connecting-line"></div>
+            <ul class="nav nav-tabs step-nav" role="tablist">
+              <li role="presentation" id="step1" class="active">
+                <a role="tab" aria-expanded="true"><span class="round-tab">1 </span> <i>Branches</i></a>
+              </li>
+              <li role="presentation" id="step2" class="active">
+                <a role="tab" aria-expanded="false"><span class="round-tab">2</span> <i>Rollout</i></a>
+              </li>
+              <li role="presentation" id="step3" class="active">
+                <a role="tab"><span class="round-tab">3</span> <i>Files</i></a>
+              </li>
+              <li role="presentation" id="step4" class="active">
+                <a role="tab"><span class="round-tab">4</span> <i>Create Rollout</i></a>
+              </li>
+              <li role="presentation" id="step5" class="active">
+                <a role="tab"><span class="round-tab">5</span> <i>Deploy Script</i></a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
 
 <div class="container">
-    <div class="row">
-        <div class="col">
-            <form method="post" action="/deploy">
-                <div class="row">
-                    <div class="col">
-                        <select class="form-control site" name="site">
-                            <option value="">Select Site</option>
-                            <% for(var i=0; i < siteList.length; i++) { %>
-                                <option value='<%= siteList[i].name %>'>
-                                    <%= siteList[i].name %>
-                                </option>
-                                <%}%>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <select class="form-control repo" name="repo">
-                            <option value="">Select Evironment</option>
-                            <% for(var i=0; i < envList.length; i++) { %>
-                                <option value='<%= envList[i].name %>'>
-                                    <%= envList[i].name %>
-                                </option>
-                                <%}%>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <div class="d-grid gap-2">
-                            <input type="submit" class="btn btn-info btn-block" value="Deploy Script">
-                        </div>
-                    </div>
-                </div>
-            </form>
+  <div class="row">
+    <div class="col">
+      <%- req.toastr.render() %>    
+      <form method="post" action="/deploy">
+        <div class="row">
+          <div class="col">
+            <select class="form-control site" name="site" id="site" required>
+              <option value="">Select Site</option>
+              <% for(var i=0; i < siteList.length; i++) { %>
+                <option value='<%= siteList[i].id %>'>
+                  <%= siteList[i].name %>
+                </option>
+                <%}%>
+            </select>
+          </div>
+          <div class="col">
+            <select class="form-control environment" name="environment" id="environment" required>
+              <option value="">
+                Select Environment
+              </option>
+            </select>
+          </div>
+          <div class="col">
+            <div class="d-grid gap-2">
+              <input type="submit" class="btn btn-info btn-block" formaction="/deploy?button=deploy" value="Deploy Script">
+            </div>
+          </div>
+          <div class="col">
+            <div class="d-grid gap-2">             
+                <input type="submit" class="btn btn-info btn-block" formaction="/deploy?button=uni" value="Uninstall">             
+            </div>
+          </div>
         </div>
+      </form>
+     
     </div>
+  </div>
 </div>
 <footer>
-    <%- include('../partials/footer'); %>
+  <%- include('../partials/footer'); %>
 </footer>
